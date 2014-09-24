@@ -1,4 +1,31 @@
 #include <stdio.h>
+#include <string.h>
+
+#define TOKENS "><+-.,[]"
+
+void tokenize( FILE* file, char* tokenized_instructions )
+{
+	char temp;
+	int i = 0;
+	while ( (temp = fgetc( file )) != EOF )
+	{
+		int j;
+		for ( j = 0; j < strlen( TOKENS ); j++ )
+		{
+			if ( temp == TOKENS[j] )
+			{
+				tokenized_instructions[i] = temp;
+				break;
+			}
+			else if ( j >= strlen( TOKENS )-1 )
+			{
+				i--;
+			}
+		}
+		i++;
+	}
+	tokenized_instructions[i+1] = '\0';
+}
 
 int main( int argc, char** argv )
 {
@@ -10,7 +37,7 @@ int main( int argc, char** argv )
 		return 1;
 	}
 
-	if ( (program_file = fopen( argv[1], "rb" )) == NULL )
+	if ( (program_file = fopen( argv[1], "r" )) == NULL )
 	{
 		fprintf( stderr, "Not a valid file!\nPlease only feed me .bf or .b files!\n" );
 		return 2;
@@ -18,17 +45,10 @@ int main( int argc, char** argv )
 	
 	printf( "-> Loaded file: %s\n", argv[1] );
 
-	char instructions[30000] = {0};
+	char instructions[30000];
+	tokenize( program_file, instructions );
 
-	int i;
-	char temp;
-	for ( i = 0, temp = fgetc( program_file ); temp != EOF; i++, temp = fgetc( program_file )  )
-	{
-		instructions[i] = temp;
-		printf( "Temp: %c\nInstructions[%d]: %c\n", temp, i, instructions[i] );
-	}
-
-	printf( "%s", instructions );
+	printf( "%s\n", instructions );
 
 	fclose( program_file );
 
